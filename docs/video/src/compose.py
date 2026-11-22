@@ -1,4 +1,4 @@
-﻿"""Build stills (HTML -> PNG via Playwright/Edge) and the timeline for the Prove It demo video."""
+"""Build stills (HTML -> PNG via Playwright/Edge) and the timeline for the Prove It demo video."""
 import json, html
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -6,7 +6,8 @@ from playwright.sync_api import sync_playwright
 HERE = Path(__file__).parent
 SH = (HERE / "shots").as_uri() + "/"
 FR = HERE / "frames"; FR.mkdir(exist_ok=True)
-SEG = json.loads((HERE / "audio" / "segments.json").read_text(encoding="utf-8"))
+SEG_FILE = HERE / "audio" / "segments.json"
+SEG = json.loads(SEG_FILE.read_text(encoding="utf-8")) if SEG_FILE.exists() else {}
 LEAD = 0.5
 TAIL = {1: 2.5, 2: 1.5, 3: 2.5, 4: 3.5, 5: 3.5, 6: 3.0, 7: 3.0, 8: 4.5}
 CHAPTERS = [("Problem", [1, 2]), ("How", [3]), ("Slop", [4]), ("Real bug", [5]), ("Attack", [6]), ("Impact", [7, 8])]
@@ -82,8 +83,8 @@ VIS = {
      card('<div class="num"><b>30–60 min</b></div><div class="numl">a senior engineer on a typical report · 1,390+ reports in H1 2026<br><small>Elastic Security Labs, 2026-08-04 · elastic.co/security-labs/ai-vulnerability-triage-bug-bounty-hackerone</small></div>'),
      card('<div class="title2">We don\'t detect AI.</div>'), card('<div class="title2">We don\'t detect AI.<br><b>We require proof.</b></div>')],
  8: [card('<div class="grid">' + "".join(f'<div>{t}</div>' for t in ["Rooms", "Linked rooms", "Custom agent<br><small>agent protocol</small>", "Claude Code + Codex<br><small>in one room</small>", "Switch Trust", "Room document", "Template YAML", "Private triage room"]) + '</div><div class="fine">Switch features used in this live run</div>'),
-     card('<div class="title">Prove It</div><div class="sub">Make the AI prove its bug report before a human reads it.</div><div class="built">github.com/akhilll0305/team-pikachu-switch-ai</div>'),
-     card('<div class="title">Prove It</div><div class="built big2">Built on <b>Switch</b></div><div class="built">github.com/akhilll0305/team-pikachu-switch-ai</div>')],
+     card('<div class="title">Prove It</div><div class="sub">Make the AI prove its bug report before a human reads it.</div><div class="built">github.com/Utkarsh240102/Prove-IT</div>'),
+     card('<div class="title">Prove It</div><div class="built big2">Built on <b>Switch</b></div><div class="built">github.com/Utkarsh240102/Prove-IT</div>')],
 }
 
 CSS = f"""
@@ -117,27 +118,33 @@ CSS = f"""
 .grid{{display:grid;grid-template-columns:repeat(4,380px);gap:26px;justify-content:center}} .grid div{{background:#121a28;border:2px solid {ACC};border-radius:16px;padding:34px 10px;font-size:36px;font-weight:700}} .grid small{{font-size:22px;color:#9aa5b8;font-weight:400}}
 """
 
-def build():
+def build(seg=None, lead=None, tail=None, chapters=None, vis=None, css=None):
+    seg = seg if seg is not None else SEG
+    lead = lead if lead is not None else LEAD
+    tail = tail if tail is not None else TAIL
+    chapters = chapters if chapters is not None else CHAPTERS
+    vis = vis if vis is not None else VIS
+    css = css if css is not None else CSS
     # timeline
     t, stills, scenes, audio = 0.0, [], [], []
     for n in range(1, 9):
-        s = SEG[str(n)]; L = LEAD + s["dur"] + TAIL[n]
-        audio.append({"n": n, "at": t + LEAD})
-        starts = [0.0] + [LEAD + x["start"] for x in s["sents"][1:]]
-        vis = VIS[n]; assert len(vis) == len(s["sents"]), (n, len(vis), len(s["sents"]))
+        s = seg[str(n)]; L = lead + s["dur"] + tail[n]
+        audio.append({"n": n, "at": t + lead})
+        starts = [0.0] + [lead + x["start"] for x in s["sents"][1:]]
+        v = vis[n]; assert len(v) == len(s["sents"]), (n, len(v), len(s["sents"]))
         for i, st in enumerate(starts):
             end = starts[i + 1] if i + 1 < len(starts) else L
-            stills.append({"scene": n, "i": i, "t0": t + st, "dur": end - st, "cap": s["sents"][i]["text"], "html": vis[i]})
+            stills.append({"scene": n, "i": i, "t0": t + st, "dur": end - st, "cap": s["sents"][i]["text"], "html": v[i]})
         scenes.append({"n": n, "t0": t, "dur": L}); t += L
     total = t
     with sync_playwright() as p:
         b = p.chromium.launch(channel="msedge", headless=True)
         pg = b.new_page(viewport={"width": 1920, "height": 1080})
         for k, s in enumerate(stills):
-            cur = next(ci for ci, (_, ns) in enumerate(CHAPTERS) if s["scene"] in ns)
-            prog = "".join(f'<div class="{"cur" if ci == cur else ""}">{c}</div>' for ci, (c, _) in enumerate(CHAPTERS))
+            cur = next(ci for ci, (_, ns) in enumerate(chapters) if s["scene"] in ns)
+            prog = "".join(f'<div class="{"cur" if ci == cur else ""}">{c}</div>' for ci, (c, _) in enumerate(chapters))
             pct = 100 * (s["t0"] + s["dur"] / 2) / total
-            doc = f'<html><head><meta charset="utf-8"><style>{CSS}</style></head><body><div class="prog">{prog}</div><div class="bar" style="width:{pct:.1f}%"></div><div class="main">{s["html"]}</div><div class="cap">{esc(s["cap"])}</div></body></html>'
+            doc = f'<html><head><meta charset="utf-8"><style>{css}</style></head><body><div class="prog">{prog}</div><div class="bar" style="width:{pct:.1f}%"></div><div class="main">{s["html"]}</div><div class="cap">{esc(s["cap"])}</div></body></html>'
             f = FR / f"f{k:03d}.html"; f.write_text(doc, encoding="utf-8")
             pg.goto(f.as_uri()); pg.wait_for_timeout(150)
             pg.screenshot(path=str(FR / f"f{k:03d}.png"))
@@ -147,4 +154,6 @@ def build():
     print("stills", len(stills), "total", round(total, 1))
     for sc in scenes: print("scene", sc["n"], round(sc["t0"], 1), round(sc["dur"], 1))
 
-build()
+
+if __name__ == "__main__":
+    build()

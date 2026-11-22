@@ -1,7 +1,22 @@
 """v2: same visual system as compose.py, new idea-first story and review4 live-trial footage."""
+import sys
 from pathlib import Path
-src = (Path(__file__).parent / "compose.py").read_text(encoding="utf-8-sig").rsplit("build()", 1)[0]
-exec(src)
+
+HERE = Path(__file__).parent
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+
+from compose import (
+    CSS,
+    SEG,
+    card,
+    diagram,
+    esc,
+    heads,
+    img,
+    term,
+    build as compose_build,
+)
 
 LEAD = 0.15
 TAIL = {1: 0.3, 2: 0.3, 3: 1.2, 4: 0.3, 5: 0.3, 6: 0.3, 7: 0.3, 8: 1.8}
@@ -73,7 +88,7 @@ VIS = {
      card('<div class="big">Built for any team that receives security reports</div><div class="grid g3"><div class="on">Library maintainers<br><small>PyYAML-style projects drowning in "critical" reports</small></div><div class="on">Bug bounty desks<br><small>triage before an engineer spends an hour</small></div><div class="on">Open-source security teams<br><small>evidence, timeline and draft advisory per ticket</small></div></div><div class="fine">Possible users, not current customers</div>'),
      card('<div class="sub">Import the template: rooms, agents, room documents and the link, in one step.</div>' + TPL)],
  8: [card('<div class="title">Prove It</div>'), card('<div class="title">Prove It</div><div class="sub">Code decides. Agents argue. <b style="color:#f5b942">Humans rule.</b></div>'),
-     card('<div class="title">Prove It</div><div class="sub">Code decides. Agents argue. <b style="color:#f5b942">Humans rule.</b></div><div class="built big2">Built on <b>Switch</b>, for Flip the Switch</div><div class="built">github.com/akhilll0305/team-pikachu-switch-ai</div>')],
+     card('<div class="title">Prove It</div><div class="sub">Code decides. Agents argue. <b style="color:#f5b942">Humans rule.</b></div><div class="built big2">Built on <b>Switch</b>, for Flip the Switch</div><div class="built">github.com/Utkarsh240102/Prove-IT</div>')],
 }
 CSS += """
 .tiles{display:flex;flex-wrap:wrap;gap:28px;justify-content:center;max-width:1760px}
@@ -88,4 +103,9 @@ CSS += """
 .crit{background:#ff6b5a;color:#111;font-weight:800;font-size:22px;padding:3px 10px;border-radius:6px;margin-right:10px}.flm{font-size:20px;color:#8b96a8;margin-top:6px}
 .g6{grid-template-columns:repeat(3,480px)} .g3{grid-template-columns:repeat(3,520px)} .grid div.off{opacity:.25} .grid div.on{opacity:1}
 """
-build()
+def build():
+    compose_build(seg=SEG, lead=LEAD, tail=TAIL, chapters=CHAPTERS, vis=VIS, css=CSS)
+
+
+if __name__ == "__main__":
+    build()
