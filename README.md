@@ -33,7 +33,7 @@
 </p>
 
 <p align="center">
-  <a href="<VIDEO_LINK>"><b>Demo video</b></a> ·
+  <a href="https://www.youtube.com/watch?v=wQ_h16DFlXc"><b>Demo video</b></a> ·
   <a href="#one-report-end-to-end"><b>How it works</b></a> ·
   <a href="#where-switch-fits"><b>Where Switch fits</b></a> ·
   <a href="#results-from-real-runs"><b>Results</b></a> ·
@@ -51,6 +51,9 @@
     <td align="center"><h2>325</h2>tests passing,<br>CI green on main</td>
   </tr>
 </table>
+
+> [!TIP]
+> **Demo video:** Watch the walkthrough on [YouTube](https://www.youtube.com/watch?v=wQ_h16DFlXc) or offline directly in the repository at [`docs/video/prove-it-demo-v3.mp4`](docs/video/prove-it-demo-v3.mp4).
 
 ## Ten seconds to write, an hour to check
 
@@ -446,7 +449,7 @@ switch/             Switch templates: agents, rooms, link, instructions, room do
 reports/replays/    replayed CVE reports, slop reports and the injection report
 scripts/            rehearsal, headless Switch server, end-to-end and live checks, replay driver
 tests/              325 tests, including the OSV schema they validate against
-docs/               setup guide, demo flow, scope policies, evidence from every recorded run
+docs/               setup guide, demo flow, video (docs/video/prove-it-demo-v3.mp4), scope policies
 ```
 
 Python (standard library only), Docker, YAML templates for Switch, Mermaid, GitHub Actions on Ubuntu and Windows.
