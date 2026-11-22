@@ -4,18 +4,18 @@
 
 | File | What it is |
 | --- | --- |
-| `docs/video/out/prove-it-demo-v2.mp4` | **Final.** 2:51.7, 1920×1080, 30 fps, H.264, AAC stereo, −16.8 LUFS |
-| `docs/video/out/prove-it-demo-v1.mp4` | Backup of v1: 2:50, footage from main's live run on 2026-11-06 |
+| `docs/video/out/prove-it-demo-v3.mp4` | Current render, generated from the v2 story and the updated narration. |
 | `docs/video/out/thumbnail.png` | Thumbnail, 1280×720 |
-| `docs/video/VOICEOVER.md` | v2 script; v1 is kept in `VOICEOVER-v1.md` |
-| `docs/video/src/` | Build scripts |
+| `docs/video/VOICEOVER.md` | Current narration script |
+| `docs/video/src/capture4.py`, `compose2.py`, `render2.py`, `sfx.py`, `tts.py` | Current capture and render entrypoints |
+| `docs/video/src/compose.py` | Shared visual helpers imported by `compose2.py` |
 
-The build scripts in `docs/video/src/`:
-- `capture.py` / `capture4.py`: screenshots of real Mattermost posts
+The current build scripts in `docs/video/src/`:
+- `capture4.py`: screenshots of real Mattermost posts
 - `tts.py`: narration
-- `compose.py` / `compose2.py`: the stills
+- `compose2.py` (using shared helpers from `compose.py`): the stills
 - `sfx.py`: synthesized music and sound effects
-- `render.py` / `render2.py`: the final render
+- `render2.py`: the current render
 
 ## 1. Audit of v1
 
@@ -113,13 +113,13 @@ These were found by searching `pikachu-lib2` at `7568a4e`. Check each against th
 | `docs/CHECKPOINT.md:143, 156` | O8/P5 live coverage partial / "not yet live" |
 | `docs/DEMO.md:7, 37` | "Needs a live run before recording"; sqlparse "verified offline" |
 
-## 7. Final checks run on v2
+## 7. Final checks recorded for v2
 
 | Check | Result |
 | --- | --- |
 | Duration | 2:51.67 (ffmpeg), under 3:00 |
-| Silences | `silencedetect=noise=-35dB:d=0.4` on the full mix: **0 gaps** (v1: 42) |
+| Silences | `silencedetect=noise=-35dB:d=0.4` on the v2 full mix: **0 gaps** (v1: 42) |
 | Loudness | −16.8 LUFS integrated |
 | Captions | Each still and its caption switch at the sentence boundary reported by the TTS engine |
 | Frames | Contact sheet of all 43 stills checked; I fixed one overflowing frame (the reporter-limit frame) |
-| Tested | Not watched end to end with sound by me. Please do one full watch before uploading. |
+| v2 review | Not watched end to end with sound by me. Please do one full watch of the current v3 render before uploading. |

@@ -1,6 +1,6 @@
 # Prove It: demo voiceover v2 (target 2:40 to 2:55)
 
-About 430 words at roughly 165 words a minute. v1 is kept in `VOICEOVER-v1.md`.
+About 430 words at roughly 165 words a minute.
 
 **Footage:** live trial `review4`, 2026-11-07. Managed Claude Code and Codex agents in Switch Console, on Mattermost.
 
